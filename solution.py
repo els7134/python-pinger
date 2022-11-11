@@ -47,10 +47,24 @@ def receiveOnePing(mySocket, ID, timeout, destAddr):
         recPacket, addr = mySocket.recvfrom(1024)
 
         # Fill in start
-
         # Fetch the ICMP header from the IP packet
 
+        icmpHeader = recPacket[20:28]
+
+        icmpType, code, mychecksum, packetID, sequence = struct.unpack("bbHHh", icmpHeader)
+        # print icmpType
+
+        if icmpType != 8 and packetID = ID:
+            bytesInDouble = struct.calcsize("d")
+            timeSent = struct.unpack("d", recPacket[28:28 + bytesInDouble])[0]
+            rtt = timeReceived - timeSent
+            bytes = len(recPacket)
+            ttl = str(recPacket[8:8])
+            stats = (bytes, ttl)
+            return rtt, stats
+
         # Fill in end
+
         timeLeft = timeLeft - howLongInSelect
         if timeLeft <= 0:
             return "Request timed out."
@@ -112,7 +126,8 @@ def ping(host, timeout=1):
 
     for i in range(0, 4):  # Four pings will be sent (loop runs for i=0, 1, 2, 3)
         delay, statistics = doOnePing(dest, timeout)  # what is stored into delay and statistics?
-        response =  # store your bytes, rtt, and ttle here in your response pandas dataframe. An example is commented out below for vars
+        response = response.append({'bytes': statistics[0], 'rtt': delay, 'ttl': statistics[1])\
+        # store your bytes, rtt, and ttle here in your response pandas dataframe. An example is commented out below for vars
         print(delay)
         time.sleep(1)  # wait one second
 
@@ -120,10 +135,10 @@ def ping(host, timeout=1):
     packet_recv = 0
     # fill in start. UPDATE THE QUESTION MARKS
     for index, row in response.iterrows():
-        if ???? == 0:  # access your response df to determine if you received a packet or not
-            packet_lost =  # ????
+        if statistics[0] == 0:  # access your response df to determine if you received a packet or not
+            packet_lost =  packet_lost + 1
         else:
-            packet_recv =  # ????
+            packet_recv =  packet_recv + 1
     # fill in end
 
     # You should have the values of delay for each ping here structured in a pandas dataframe;
